@@ -88,9 +88,7 @@ source /ruta/completa/inventarioksc/database/schema.sql
 source /ruta/completa/inventarioksc/database/seed.sql
 ```
 
-Esto crea:
-- **Administrador:** `admin@ksc.com` / `admin123`
-- **Auxiliar:** `auxiliar@ksc.com` / `aux123`
+
 - 4 productos de ejemplo (2 OK, 1 bajo stock, 1 crítico)
 
 ### 6. Iniciar el servidor
@@ -111,15 +109,6 @@ Visita [http://localhost:3000](http://localhost:3000) en tu navegador.
 
 ---
 
-## Credenciales de prueba
-
-| Rol | Correo | Contraseña |
-|---|---|---|
-| Administrador | admin@ksc.com | admin123 |
-| Auxiliar | auxiliar@ksc.com | aux123 |
-
----
-
 ## Roles y permisos
 
 | Función | Administrador | Auxiliar |
@@ -127,7 +116,7 @@ Visita [http://localhost:3000](http://localhost:3000) en tu navegador.
 | Ver inventario | ✅ | ✅ |
 | Buscar / filtrar | ✅ | ✅ |
 | Agregar producto | ✅ | ❌ |
-| Editar producto | ✅ | ❌ |
+| Editar producto | ✅ | ✅ |
 | Eliminar producto | ✅ | ❌ |
 
 ---
