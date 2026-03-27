@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InventarioKSC — Panel Administrador</title>
+    <meta name="description" content="Panel de administración del inventario InventarioKSC." />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="dashboard">
+
+        <!-- ══ SIDEBAR ═══════════════════════════════════════════ -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <h2>☕ InventarioKSC</h2>
+                <span>Panel Administrador</span>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <div class="nav-item active" aria-current="page">
+                    <span class="nav-icon">📦</span>
+                    Inventario
+                </div>
+                <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
+                    <span class="nav-icon">🗓️</span>
+                    Eventos
+                    <span class="nav-badge-soon">Pronto</span>
+                </div>
+                <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
+                    <span class="nav-icon">🎓</span>
+                    Talleres
+                    <span class="nav-badge-soon">Pronto</span>
+                </div>
+            </nav>
+
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">👤</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebarNombre">—</div>
+                    <div class="sidebar-user-rol">Administrador</div>
+                </div>
+                <button class="btn-logout" id="btnLogout" title="Cerrar sesión">↩</button>
+            </div>
+        </aside>
+
+        <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════ -->
+        <main class="main-content">
+            <div class="section-header">
+                <h1>Inventario</h1>
+                <button class="btn-add" id="btnAbrirFormulario">
+                    + Agregar Producto
+                </button>
+            </div>
+
+            <!-- Pestañas -->
+            <div class="tabs" role="tablist">
+                <button class="tab-btn" id="tabAgregar" role="tab" aria-controls="paneAgregar" aria-selected="false">
+                    Agregar
+                </button>
+                <button class="tab-btn active" id="tabVer" role="tab" aria-controls="paneVer" aria-selected="true">
+                    Ver Inventario
+                </button>
+            </div>
+
+            <!-- ─── PESTAÑA: Agregar ─────────────────────────────── -->
+            <div id="paneAgregar" class="tab-pane" role="tabpanel">
+                <div class="form-card fade-in">
+                    <div id="formAlert" class="form-alert"></div>
+
+                    <form id="productForm" novalidate>
+                        <input type="hidden" id="productoId" value="" />
+
+                        <div class="form-grid">
+                            <!-- Nombre -->
+                            <div class="form-group full-width">
+                                <label for="nombre">Nombre del producto *</label>
+                                <input type="text" id="nombre" placeholder="Ej: Café Geisha 250g" required />
+                            </div>
+
+                            <!-- Categoría -->
+                            <div class="form-group">
+                                <label for="categoria">Categoría *</label>
+                                <select id="categoria" required>
+                                    <option value="">Selecciona una categoría</option>
+                                    <option value="Café">Café</option>
+                                    <option value="Insumo">Insumo</option>
+                                    <option value="Material de evento">Material de evento</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+
+                            <!-- Unidad de medida -->
+                            <div class="form-group">
+                                <label for="unidad_medida">Unidad de medida *</label>
+                                <select id="unidad_medida" required>
+                                    <option value="">Selecciona una unidad</option>
+                                    <option value="Unidades">Unidades</option>
+                                    <option value="Kg">Kg</option>
+                                    <option value="Gramos">Gramos</option>
+                                    <option value="Litros">Litros</option>
+                                    <option value="Paquetes">Paquetes</option>
+                                </select>
+                            </div>
+
+                            <!-- Cantidad -->
+                            <div class="form-group">
+                                <label for="cantidad">Cantidad disponible *</label>
+                                <input type="number" id="cantidad" placeholder="0" min="0" step="0.001" required />
+                            </div>
+
+                            <!-- Stock mínimo -->
+                            <div class="form-group">
+                                <label for="stock_minimo">Stock mínimo *</label>
+                                <input type="number" id="stock_minimo" placeholder="0" min="0" step="0.001" required />
+                            </div>
+
+                            <!-- Precio -->
+                            <div class="form-group">
+                                <label for="precio">Precio *</label>
+                                <input type="number" id="precio" placeholder="0" min="0" step="0.01" required />
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save" id="btnGuardar">Guardar producto</button>
+                            <button type="button" class="btn-cancel" id="btnCancelarForm">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- ─── PESTAÑA: Ver Inventario ─────────────────────── -->
+            <div id="paneVer" class="tab-pane active" role="tabpanel">
+                <!-- Buscador -->
+                <div class="search-bar">
+                    <span class="search-icon">🔍</span>
+                    <input type="search" id="buscador" placeholder="Buscar por nombre o categoría…"
+                        aria-label="Buscar productos" />
+                </div>
+
+                <!-- Tabla -->
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table id="tablaInventario" aria-label="Lista de productos en inventario">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Unidad</th>
+                                    <th>Stock mínimo</th>
+                                    <th>Precio</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyInventario">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <span style="font-size:2rem">📋</span>
+                                            <p>Cargando inventario…</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pie de tabla -->
+                    <div class="table-footer">
+                        <span id="totalProductos">Total productos: 0</span>
+                        <span>
+                            <span class="alert-count" id="enAlerta">En alerta: 0</span>
+                        </span>
+                    </div>
+                </div>
+            </div><!-- /paneVer -->
+        </main>
+    </div><!-- /dashboard -->
+
+    <!-- ══ MODAL EDICIÓN ════════════════════════════════════════ -->
+    <div class="modal-overlay" id="modalEdicion" role="dialog" aria-modal="true" aria-labelledby="modalEdicionTitulo">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modalEdicionTitulo">Editar producto</h3>
+                <button class="btn-close-modal" id="btnCerrarModal" aria-label="Cerrar">✕</button>
+            </div>
+
+            <div id="modalAlert" class="form-alert"></div>
+
+            <form id="editForm" novalidate>
+                <input type="hidden" id="editId" />
+
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="editNombre">Nombre del producto *</label>
+                        <input type="text" id="editNombre" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCategoria">Categoría *</label>
+                        <select id="editCategoria" required>
+                            <option value="">Selecciona una categoría</option>
+                            <option value="Café">Café</option>
+                            <option value="Insumo">Insumo</option>
+                            <option value="Material de evento">Material de evento</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editUnidad">Unidad de medida *</label>
+                        <select id="editUnidad" required>
+                            <option value="">Selecciona una unidad</option>
+                            <option value="Unidades">Unidades</option>
+                            <option value="Kg">Kg</option>
+                            <option value="Gramos">Gramos</option>
+                            <option value="Litros">Litros</option>
+                            <option value="Paquetes">Paquetes</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCantidad">Cantidad disponible *</label>
+                        <input type="number" id="editCantidad" min="0" step="0.001" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStockMin">Stock mínimo *</label>
+                        <input type="number" id="editStockMin" min="0" step="0.001" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPrecio">Precio *</label>
+                        <input type="number" id="editPrecio" min="0" step="0.01" required />
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Guardar cambios</button>
+                    <button type="button" class="btn-cancel" id="btnCancelarEdit">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ MODAL CONFIRMACIÓN ELIMINACIÓN ═══════════════════════ -->
+    <div class="modal-overlay" id="modalEliminar" role="dialog" aria-modal="true" aria-labelledby="modalEliminarTitulo">
+        <div class="modal confirm-modal">
+            <div class="confirm-icon">🗑️</div>
+            <h3 id="modalEliminarTitulo">¿Eliminar producto?</h3>
+            <p id="confirmMsg">Esta acción no se puede deshacer.</p>
+            <div class="confirm-actions">
+                <button class="btn-danger" id="btnConfirmarEliminar">Sí, eliminar</button>
+                <button class="btn-cancel" id="btnCancelarEliminar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast global -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>InventarioKSC — Iniciar sesión</title>
+  <meta name="description" content="Sistema de gestión de inventario para InventarioKSC. Inicia sesión con tu cuenta corporativa." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <!-- Logo / marca -->
+      <div class="login-logo">
+        <div class="login-logo-icon">☕</div>
+        <div>
+          <h1>InventarioKSC</h1>
+          <span>Gestión de inventario</span>
+        </div>
+      </div>
+
+      <h2>Bienvenido</h2>
+      <p class="subtitle">Ingresa con tu cuenta para continuar</p>
+
+      <!-- Mensaje de error -->
+      <div id="loginError" class="login-error" role="alert"></div>
+
+      <!-- Formulario -->
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="correo">Correo electrónico</label>
+          <input
+            type="email"
+            id="correo"
+            name="correo"
+            placeholder="correo@empresa.com"
+            autocomplete="email"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <input
+            type="password"
+            id="contrasena"
+            name="contrasena"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+        </div>
+
+        <button type="submit" id="btnIngresar" class="btn-primary">
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    /* ── Login ──────────────────────────────────────────────── */
+    const form      = document.getElementById('loginForm');
+    const correoEl  = document.getElementById('correo');
+    const passwdEl  = document.getElementById('contrasena');
+    const errorEl   = document.getElementById('loginError');
+    const btnEl     = document.getElementById('btnIngresar');
+
+    function showError(msg) {
+      errorEl.textContent  = msg;
+      errorEl.classList.add('visible');
+    }
+    function clearError() {
+      errorEl.textContent = '';
+      errorEl.classList.remove('visible');
+      correoEl.classList.remove('error');
+      passwdEl.classList.remove('error');
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearError();
+
+      const correo    = correoEl.value.trim();
+      const contrasena = passwdEl.value;
+
+      // Validación local
+      if (!correo || !contrasena) {
+        correoEl.classList.toggle('error', !correo);
+        passwdEl.classList.toggle('error', !contrasena);
+        showError('Por favor ingresa tu correo y contraseña');
+        return;
+      }
+
+      btnEl.disabled   = true;
+      btnEl.textContent = 'Ingresando…';
+
+      try {
+        const res  = await fetch('/api/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ correo, contrasena }),
+        });
+        const data = await res.json();
+
+        if (!data.ok) {
+          // Mensajes específicos según el código de error
+          if (data.code === 'EMPTY_FIELDS') {
+            showError('Por favor ingresa tu correo y contraseña');
+          } else if (data.code === 'EMAIL_NOT_FOUND') {
+            correoEl.classList.add('error');
+            showError('No encontramos una cuenta con ese correo');
+          } else {
+            passwdEl.classList.add('error');
+            showError('Usuario o contraseña incorrectos');
+          }
+          return;
+        }
+
+        // Redirigir según rol
+        const rol = data.usuario.rol;
+        if (rol === 'administrador') {
+          window.location.href = '/inventario.html';
+        } else {
+          window.location.href = '/auxiliar.html';
+        }
+      } catch (err) {
+        showError('No se pudo conectar al servidor. Intenta de nuevo.');
+      } finally {
+        btnEl.disabled    = false;
+        btnEl.textContent = 'Ingresar';
+      }
+    });
+
+    // Si hay sesión activa, redirigir
+    (async () => {
+      try {
+        const res  = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data.ok) {
+          window.location.href = data.usuario.rol === 'administrador'
+            ? '/inventario.html' : '/auxiliar.html';
+        }
+      } catch (_) { /* sin sesión activa */ }
+    })();
+  </script>
+</body>
+</html>
