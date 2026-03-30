@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   correo        VARCHAR(255)      NOT NULL,
   contrasena_hash VARCHAR(255)    NOT NULL,
   rol           ENUM('administrador','auxiliar') NOT NULL DEFAULT 'auxiliar',
+  activo        TINYINT(1)        NOT NULL DEFAULT 1,
   creado_en     TIMESTAMP         NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (id),

@@ -5,52 +5,71 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InventarioKSC — Panel Auxiliar</title>
-    <meta name="description" content="Vista de inventario para auxiliar de InventarioKSC." />
     <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 
 <body>
     <div class="dashboard">
 
         <!-- ══ SIDEBAR ═══════════════════════════════════════════ -->
-        <aside class="sidebar">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
-                <h2>☕ InventarioKSC</h2>
-                <span>Panel Auxiliar</span>
+                <button class="btn-toggle-sidebar mobile-only" id="btnCerrarSidebar" aria-label="Cerrar menú">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <h2><span class="material-symbols-outlined">local_cafe</span> InventarioKSC</h2>
             </div>
 
             <nav class="sidebar-nav" aria-label="Navegación principal">
                 <div class="nav-item active" aria-current="page">
-                    <span class="nav-icon">📦</span>
+                    <span class="nav-icon material-symbols-outlined">inventory_2</span>
                     Inventario
                 </div>
                 <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
-                    <span class="nav-icon">🗓️</span>
+                    <span class="nav-icon material-symbols-outlined">calendar_month</span>
                     Eventos
                     <span class="nav-badge-soon">Pronto</span>
                 </div>
                 <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
-                    <span class="nav-icon">🎓</span>
+                    <span class="nav-icon material-symbols-outlined">school</span>
                     Talleres
                     <span class="nav-badge-soon">Pronto</span>
                 </div>
             </nav>
 
-            <div class="sidebar-user">
-                <div class="sidebar-user-avatar">👤</div>
+            <div class="user-dropdown" id="userDropdown" tabindex="0" role="button" aria-haspopup="true">
+                <div class="sidebar-user-avatar"><span class="material-symbols-outlined">person</span></div>
                 <div class="sidebar-user-info">
                     <div class="sidebar-user-name" id="sidebarNombre">—</div>
                     <div class="sidebar-user-rol">Auxiliar</div>
                 </div>
-                <button class="btn-logout" id="btnLogout" title="Cerrar sesión">↩</button>
+                <span class="material-symbols-outlined"
+                    style="margin-left: auto; color: var(--text-light)">expand_more</span>
+
+                <div class="user-dropdown-menu">
+                    <button class="dropdown-item" id="btnCambiarPass">
+                        <span class="material-symbols-outlined">key</span> Actualizar contraseña
+                    </button>
+                    <button class="dropdown-item danger" id="btnLogoutDrop">
+                        <span class="material-symbols-outlined">logout</span> Salir del programa
+                    </button>
+                </div>
             </div>
         </aside>
 
         <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════ -->
         <main class="main-content">
+            <header class="top-bar">
+                <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Abrir menú">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="breadcrumb">Panel Auxiliar / <strong>Inventario</strong></div>
+            </header>
+
             <div class="section-header">
                 <h1>Inventario</h1>
-                <!-- No hay botón "Agregar" para el auxiliar -->
             </div>
 
             <!-- Solo pestaña "Ver Inventario" visible -->
@@ -60,25 +79,37 @@
                 </button>
             </div>
 
-            <!-- Buscador -->
-            <div class="search-bar">
-                <span class="search-icon">🔍</span>
-                <input type="search" id="buscador" placeholder="Buscar por nombre o categoría…"
-                    aria-label="Buscar productos" />
+            <!-- Buscador + Ordenador -->
+            <div class="search-row">
+                <div class="search-bar">
+                    <span class="search-icon material-symbols-outlined">search</span>
+                    <input type="search" id="buscador" placeholder="Buscar por nombre o etiqueta…"
+                        aria-label="Buscar productos" />
+                </div>
+                <div class="sort-bar">
+                    <span class="material-symbols-outlined sort-icon">sort</span>
+                    <select id="ordenador" aria-label="Ordenar inventario">
+                        <option value="default">Sin ordenar</option>
+                        <option value="nombre_asc">Nombre A→Z</option>
+                        <option value="etiqueta">Por etiqueta</option>
+                        <option value="categoria">Por categoría</option>
+                        <option value="stock_alerta">Stock mínimo</option>
+                    </select>
+                </div>
             </div>
 
-            <!-- Tabla (sin columna Acciones) -->
+            <!-- Tabla -->
             <div class="card">
                 <div class="table-wrapper">
                     <table id="tablaInventario" aria-label="Consulta de inventario">
                         <thead>
                             <tr>
                                 <th>Nombre</th>
+                                <th>Etiqueta</th>
                                 <th>Categoría</th>
                                 <th>Cantidad</th>
                                 <th>Unidad</th>
                                 <th>Stock mínimo</th>
-                                <th>Precio</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -86,7 +117,8 @@
                             <tr>
                                 <td colspan="7">
                                     <div class="empty-state">
-                                        <span style="font-size:2rem">📋</span>
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:2.5rem; color: var(--text-muted)">list_alt</span>
                                         <p>Cargando inventario…</p>
                                     </div>
                                 </td>
@@ -109,7 +141,7 @@
     <div class="modal-overlay" id="modalEdicion" role="dialog" aria-modal="true" aria-labelledby="modalEdicionTitulo">
         <div class="modal">
             <div class="modal-header">
-                <h3 id="modalEdicionTitulo">Editar producto</h3>
+                <h3 id="modalEdicionTitulo">Actualizar cantidad</h3>
                 <button class="btn-close-modal" id="btnCerrarModal" aria-label="Cerrar">✕</button>
             </div>
 
@@ -120,49 +152,31 @@
 
                 <div class="form-grid">
                     <div class="form-group full-width">
-                        <label for="editNombre">Nombre del producto *</label>
+                        <label for="editNombre">Nombre del producto</label>
                         <input type="text" id="editNombre" readonly
                             style="background-color: var(--bg-body); cursor: not-allowed;" />
                     </div>
 
                     <div class="form-group">
-                        <label for="editCategoria">Categoría *</label>
-                        <select id="editCategoria" disabled
-                            style="background-color: var(--bg-body); cursor: not-allowed;">
-                            <option value="">Selecciona una categoría</option>
-                            <option value="Café">Café</option>
-                            <option value="Insumo">Insumo</option>
-                            <option value="Material de evento">Material de evento</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editUnidad">Unidad de medida *</label>
-                        <select id="editUnidad" disabled style="background-color: var(--bg-body); cursor: not-allowed;">
-                            <option value="">Selecciona una unidad</option>
-                            <option value="Unidades">Unidades</option>
-                            <option value="Kg">Kg</option>
-                            <option value="Gramos">Gramos</option>
-                            <option value="Litros">Litros</option>
-                            <option value="Paquetes">Paquetes</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editCantidad">Cantidad disponible *</label>
-                        <input type="number" id="editCantidad" min="0" step="0.001" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editStockMin">Stock mínimo *</label>
-                        <input type="number" id="editStockMin" readonly
+                        <label for="editCategoria">Etiqueta</label>
+                        <input type="text" id="editCategoria" readonly
                             style="background-color: var(--bg-body); cursor: not-allowed;" />
                     </div>
 
                     <div class="form-group">
-                        <label for="editPrecio">Precio *</label>
-                        <input type="number" id="editPrecio" readonly
+                        <label for="editUnidad">Unidad de medida</label>
+                        <input type="text" id="editUnidad" readonly
+                            style="background-color: var(--bg-body); cursor: not-allowed;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editCantidad">Cantidad disponible *</label>
+                        <input type="number" id="editCantidad" min="0" step="1" required />
+                    </div>
+
+                    <div class="form-group" id="stockMinGroupEdit" style="display: none;">
+                        <label for="editStockMin">Stock mínimo</label>
+                        <input type="number" id="editStockMin" readonly
                             style="background-color: var(--bg-body); cursor: not-allowed;" />
                     </div>
                 </div>
@@ -175,14 +189,59 @@
         </div>
     </div>
 
+    <!-- ══ MODAL ALERTA STOCK BAJO ═══════════════════════════ -->
+    <div class="modal-overlay" id="modalStockAlert" role="dialog" aria-modal="true">
+        <div class="modalLowStock">
+            <div class="modal-header">
+                <h3 style="color: var(--red-alert); display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">warning</span> ¡Atención: Stock Bajo!
+                </h3>
+                <button class="btn-close-modal" id="btnCerrarStockAlert">✕</button>
+            </div>
+            <p style="margin: 10px 0; font-size: 0.95rem; line-height: 1.5;">
+                Los siguientes productos están por debajo del stock mínimo. Se debe abastecer a la brevedad.
+            </p>
+            <div class="low-stock-list" id="lowStockList">
+                <!-- Se llena por JS -->
+            </div>
+            <div class="form-actions" style="margin-top: 20px;">
+                <button class="btn-save" style="width: 100%;" id="btnEntendidoStock">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL CAMBIAR CONTRASEÑA ════════════════════════════ -->
+    <div class="modal-overlay" id="modalPass" role="dialog" aria-modal="true" aria-labelledby="modalPassTitulo">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="modalPassTitulo">Cambiar Contraseña</h3>
+                <button class="btn-close-modal" id="btnCerrarModalPass" aria-label="Cerrar">✕</button>
+            </div>
+            <div id="modalPassAlert" class="form-alert"></div>
+            <form id="formCambiarPass" novalidate>
+                <div class="form-group">
+                    <label for="oldPass">Contraseña actual *</label>
+                    <input type="password" id="oldPass" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPass">Nueva contraseña *</label>
+                    <input type="password" id="newPass" required minlength="6" />
+                </div>
+                <button type="submit" class="btn-save" style="width: 100%; margin-top: 10px;">Actualizar</button>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast global -->
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <script>
-        /* ── Auxiliar panel — Solo lectura ──────────────────────── */
+        /* ── Auxiliar panel ── */
         const API = '/api';
+        let productosGlobal = [];
+        let sortActual = 'default';
 
-        // Verificar sesión y rol
+        // Verificar sesión
         (async () => {
             try {
                 const res = await fetch(`${API}/auth/me`);
@@ -196,10 +255,19 @@
         })();
 
         // Logout
-        document.getElementById('btnLogout').addEventListener('click', async () => {
+        const logoutHandler = async () => {
+            sessionStorage.removeItem('stockAlertShown');
             await fetch(`${API}/auth/logout`, { method: 'POST' });
             window.location.href = '/';
-        });
+        };
+        document.getElementById('btnLogoutDrop')?.addEventListener('click', logoutHandler);
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
 
         // Toast
         function showToast(msg, tipo = 'success') {
@@ -209,13 +277,12 @@
             setTimeout(() => { t.classList.remove('show'); }, 3000);
         }
 
-        // Formatear precio COP
-        function formatPrecio(v) {
-            return '$' + Number(v).toLocaleString('es-CO');
-        }
-
-        // Color de fila según stock
-        function applyRowColor(tr, cantidad, stockMin) {
+        // Color de fila
+        function applyRowColor(tr, cantidad, stockMin, categoria) {
+            if (categoria !== 'Insumos') {
+                tr.classList.add('row-ok');
+                return;
+            }
             const qty = Number(cantidad);
             const min = Number(stockMin);
             tr.classList.remove('row-ok', 'row-low-stock', 'row-critical');
@@ -224,48 +291,73 @@
             else tr.classList.add('row-ok');
         }
 
-        // Estado de alerta
+        // Footer
         function updateFooter(productos) {
             const total = productos.length;
-            const alerta = productos.filter(p => Number(p.cantidad) <= Number(p.stock_minimo)).length;
+            const alerta = productos.filter(p => p.categoria === 'Insumos' && Number(p.cantidad) <= Number(p.stock_minimo)).length;
             document.getElementById('totalProductos').textContent = `Total productos: ${total}`;
             document.getElementById('enAlerta').textContent = `En alerta: ${alerta}`;
         }
 
-        // Renderizar tabla (sin acciones)
-        let productosGlobal = [];
+        // Render tabla
         function renderTabla(lista) {
             const tbody = document.getElementById('tbodyInventario');
             if (!lista.length) {
-                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><span style="font-size:2rem">📭</span><p>No hay productos en el inventario.</p></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state">...</div></td></tr>`;
                 return;
             }
-            tbody.innerHTML = lista.map(p => `
-      <tr data-id="${p.id}" data-qty="${p.cantidad}" data-min="${p.stock_minimo}">
-        <td>${p.nombre}</td>
-        <td>${p.categoria}</td>
-        <td>${Number(p.cantidad).toLocaleString('es-CO')}</td>
-        <td>${p.unidad_medida}</td>
-        <td>${Number(p.stock_minimo).toLocaleString('es-CO')}</td>
-        <td class="col-precio">${formatPrecio(p.precio)}</td>
-        <td>
-           <button class="btn-action btn-edit" data-id="${p.id}" title="Editar">Editar</button>
-        </td>
-      </tr>
-    `).join('');
+            tbody.innerHTML = lista.map(p => {
+                let categBadge = [];
+                if (p.es_taller) categBadge.push('<span class="ubicacion-badge">Taller</span>');
+                if (p.es_evento) categBadge.push('<span class="ubicacion-badge secondary">Evento</span>');
+                if (p.es_producto) categBadge.push('<span class="ubicacion-badge info">Producto</span>');
+                const categHtml = categBadge.length ? categBadge.join(' ') : '<span style="color:var(--text-muted);">—</span>';
+                const stockMinTexto = p.categoria === 'Insumos' ? p.stock_minimo : '<span style="color:var(--text-muted)">—</span>';
 
-            // Aplicar colores de fila
+                return `
+                <tr data-id="${p.id}" data-qty="${p.cantidad}" data-min="${p.stock_minimo}">
+                    <td>${escapeHtml(p.nombre)}</td>
+                    <td>${escapeHtml(p.categoria)}</td>
+                    <td>${categHtml}</td>
+                    <td>${p.cantidad}</td>
+                    <td>${escapeHtml(p.unidad_medida)}</td>
+                    <td>${stockMinTexto}</td>
+                    <td><button class="btn-action btn-edit" data-id="${p.id}">Editar</button></td>
+                </tr>`;
+            }).join('');
+
             lista.forEach(p => {
                 const tr = tbody.querySelector(`tr[data-id="${p.id}"]`);
-                if (tr) applyRowColor(tr, p.cantidad, p.stock_minimo);
+                if (tr) applyRowColor(tr, p.cantidad, p.stock_minimo, p.categoria);
             });
-
             updateFooter(lista);
+            tbody.querySelectorAll('.btn-edit').forEach(btn => btn.addEventListener('click', () => abrirModalEdicion(Number(btn.dataset.id))));
+        }
 
-            // Listeners para botones de editar
-            tbody.querySelectorAll('.btn-edit').forEach(btn =>
-                btn.addEventListener('click', () => abrirModalEdicion(Number(btn.dataset.id)))
-            );
+        // Ordenar
+        function ordenarProductos(lista) {
+            const copia = [...lista];
+            switch (sortActual) {
+                case 'nombre_asc':
+                    return copia.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+                case 'etiqueta':
+                    return copia.sort((a, b) => a.categoria.localeCompare(b.categoria, 'es'));
+                case 'categoria': {
+                    const prioridad = p => p.es_taller ? 0 : p.es_evento ? 1 : p.es_producto ? 2 : 3;
+                    return copia.sort((a, b) => prioridad(a) - prioridad(b));
+                }
+                case 'stock_alerta': {
+                    const enAlerta = p => p.categoria === 'Insumos' && Number(p.cantidad) <= Number(p.stock_minimo);
+                    return copia.sort((a, b) => {
+                        const aA = enAlerta(a), bA = enAlerta(b);
+                        if (aA && !bA) return -1;
+                        if (!aA && bA) return 1;
+                        return 0;
+                    });
+                }
+                default:
+                    return copia;
+            }
         }
 
         // Filtrar
@@ -274,104 +366,128 @@
             const filtrados = productosGlobal.filter(p =>
                 p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
             );
-            renderTabla(filtrados);
+            renderTabla(ordenarProductos(filtrados));
         });
 
-        // Cargar inventario
+        document.getElementById('ordenador').addEventListener('change', function () {
+            sortActual = this.value;
+            const q = document.getElementById('buscador').value.toLowerCase().trim();
+            const filtrados = q
+                ? productosGlobal.filter(p => p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q))
+                : productosGlobal;
+            renderTabla(ordenarProductos(filtrados));
+        });
+
+        // Load
         async function loadInventario() {
             try {
                 const res = await fetch(`${API}/inventario`);
                 const data = await res.json();
-                if (!data.ok) throw new Error();
                 productosGlobal = data.data;
-                renderTabla(productosGlobal);
-            } catch (_) {
-                showToast('No se pudo cargar el inventario', 'error');
+                const q = document.getElementById('buscador').value.toLowerCase().trim();
+                if (q) {
+                    const filtrados = productosGlobal.filter(p =>
+                        p.nombre.toLowerCase().includes(q) || p.categoria.toLowerCase().includes(q)
+                    );
+                    renderTabla(ordenarProductos(filtrados));
+                } else {
+                    renderTabla(ordenarProductos(productosGlobal));
+                }
+                checkLowStock();
+            } catch (_) { }
+        }
+
+        // Modal alerta
+        function checkLowStock() {
+            if (sessionStorage.getItem('stockAlertShown')) return;
+            const lowStock = productosGlobal.filter(p => p.categoria === 'Insumos' && Number(p.cantidad) <= Number(p.stock_minimo));
+            if (lowStock.length > 0) {
+                document.getElementById('lowStockList').innerHTML = lowStock.map(p => `
+                    <div class="low-stock-item"><span>${escapeHtml(p.nombre)}</span> <span>${p.cantidad} ${escapeHtml(p.unidad_medida)}</span></div>
+                `).join('');
+                abrirModal('modalStockAlert');
+                sessionStorage.setItem('stockAlertShown', 'true');
             }
         }
 
-        /* ── Lógica de edición ── */
-        function abrirModal(id) {
-            document.getElementById(id).classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-        function cerrarModal(id) {
-            document.getElementById(id).classList.remove('open');
-            document.body.style.overflow = '';
-        }
+        // Control modales
+        function abrirModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+        function cerrarModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
 
-        document.getElementById('btnCerrarModal').addEventListener('click', () => cerrarModal('modalEdicion'));
-        document.getElementById('btnCancelarEdit').addEventListener('click', () => cerrarModal('modalEdicion'));
-
-        document.getElementById('modalEdicion').addEventListener('click', (e) => {
-            if (e.target.id === 'modalEdicion') cerrarModal('modalEdicion');
-        });
-
-        function showFormAlert(id, msg, tipo = 'error') {
-            const el = document.getElementById(id);
-            el.textContent = msg;
-            el.className = `form-alert ${tipo} visible`;
-        }
-        function hideFormAlert(id) {
-            const el = document.getElementById(id);
-            el.textContent = '';
-            el.className = 'form-alert';
-        }
-
+        // Edición
         function abrirModalEdicion(id) {
-            const producto = productosGlobal.find(p => p.id === id);
-            if (!producto) return;
+            const p = productosGlobal.find(item => item.id === id);
+            if (!p) return;
+            document.getElementById('editId').value = p.id;
+            document.getElementById('editNombre').value = p.nombre;
+            document.getElementById('editCategoria').value = p.categoria;
+            document.getElementById('editUnidad').value = p.unidad_medida;
+            document.getElementById('editCantidad').value = p.cantidad;
+            document.getElementById('editStockMin').value = p.stock_minimo;
 
-            document.getElementById('editId').value = producto.id;
-            document.getElementById('editNombre').value = producto.nombre;
-            document.getElementById('editCategoria').value = producto.categoria;
-            document.getElementById('editUnidad').value = producto.unidad_medida;
-            document.getElementById('editCantidad').value = producto.cantidad;
-            document.getElementById('editStockMin').value = producto.stock_minimo;
-            document.getElementById('editPrecio').value = producto.precio;
-            hideFormAlert('modalAlert');
+            const isInsumo = p.categoria === 'Insumos';
+            document.getElementById('stockMinGroupEdit').style.display = isInsumo ? 'block' : 'none';
 
             abrirModal('modalEdicion');
         }
 
         document.getElementById('editForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            hideFormAlert('modalAlert');
-
             const id = document.getElementById('editId').value;
-            const payload = {
-                nombre: document.getElementById('editNombre').value.trim(),
-                categoria: document.getElementById('editCategoria').value,
-                cantidad: document.getElementById('editCantidad').value,
-                unidad_medida: document.getElementById('editUnidad').value,
-                stock_minimo: document.getElementById('editStockMin').value,
-                precio: document.getElementById('editPrecio').value,
-            };
-
-            const btn = e.submitter;
-            if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
-
-            try {
-                const res = await fetch(`${API}/inventario/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                });
-                const data = await res.json();
-
-                if (!data.ok) {
-                    showFormAlert('modalAlert', data.mensaje || 'Error al actualizar');
-                    return;
-                }
-
+            const res = await fetch(`${API}/inventario/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cantidad: document.getElementById('editCantidad').value })
+            });
+            const data = await res.json();
+            if (data.ok) {
                 cerrarModal('modalEdicion');
-                await loadInventario();
-                showToast('Producto actualizado correctamente');
-            } catch (_) {
-                showFormAlert('modalAlert', 'Error de conexión. Intenta de nuevo.');
-            } finally {
-                if (btn) { btn.disabled = false; btn.textContent = 'Guardar cambios'; }
+                loadInventario();
+                showToast('Cantidad actualizada');
             }
+        });
+
+        // Toggle Sidebar
+        const btnToggle = document.getElementById('btnToggleSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const sidebar = document.getElementById('sidebar');
+        btnToggle.addEventListener('click', () => { sidebar.classList.toggle('open'); overlay.classList.toggle('visible'); });
+        overlay.addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('visible'); });
+        document.getElementById('btnCerrarSidebar').addEventListener('click', () => { sidebar.classList.remove('open'); overlay.classList.remove('visible'); });
+
+        // User Dropdown
+        const userDropdown = document.getElementById('userDropdown');
+        userDropdown.addEventListener('click', () => userDropdown.classList.toggle('open'));
+
+        // Stock Alert
+        document.getElementById('btnCerrarStockAlert').addEventListener('click', () => cerrarModal('modalStockAlert'));
+        document.getElementById('btnEntendidoStock').addEventListener('click', () => cerrarModal('modalStockAlert'));
+        document.getElementById('modalStockAlert').addEventListener('click', (e) => {
+            if (e.target.id === 'modalStockAlert') cerrarModal('modalStockAlert');
+        });
+
+        // Cerrar modal edición al click afuera
+        document.getElementById('modalEdicion').addEventListener('click', (e) => {
+            if (e.target.id === 'modalEdicion') cerrarModal('modalEdicion');
+        });
+        document.getElementById('btnCancelarEdit').addEventListener('click', () => cerrarModal('modalEdicion'));
+        document.getElementById('btnCerrarModal').addEventListener('click', () => cerrarModal('modalEdicion'));
+
+        // Password Change
+        document.getElementById('btnCambiarPass').addEventListener('click', () => { abrirModal('modalPass'); });
+        document.getElementById('btnCerrarModalPass').addEventListener('click', () => cerrarModal('modalPass'));
+        document.getElementById('formCambiarPass').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const actual = document.getElementById('oldPass').value;
+            const nueva = document.getElementById('newPass').value;
+            const res = await fetch(`${API}/usuarios/me/password`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ actual, nueva })
+            });
+            const data = await res.json();
+            if (data.ok) { cerrarModal('modalPass'); showToast('Contraseña actualizada'); }
+            else { alert(data.mensaje); }
         });
 
         loadInventario();

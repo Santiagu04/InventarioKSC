@@ -23,7 +23,7 @@ const login = async (req, res) => {
     try {
         // Buscar usuario por correo
         const [filas] = await pool.query(
-            'SELECT id, nombre, correo, contrasena_hash, rol FROM usuarios WHERE correo = ? LIMIT 1',
+            'SELECT id, nombre, correo, contrasena_hash, rol, activo FROM usuarios WHERE correo = ? LIMIT 1',
             [correo.trim().toLowerCase()]
         );
 
@@ -36,6 +36,14 @@ const login = async (req, res) => {
         }
 
         const usuario = filas[0];
+
+        if (!usuario.activo) {
+            return res.status(403).json({
+                ok: false,
+                code: 'USER_DISABLED',
+                mensaje: 'Esta cuenta ha sido deshabilitada. Contacta al administrador.',
+            });
+        }
 
         // Comparar contraseña con el hash almacenado
         const coincide = await bcrypt.compare(contrasena, usuario.contrasena_hash);

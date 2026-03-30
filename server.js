@@ -41,8 +41,11 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Rutas de la API ─────────────────────────────────────
+const usuariosRoutes = require('./routes/usuarios');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/inventario', inventarioRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 
 // ── Rutas de navegación — devuelve el HTML correspondiente ──
 app.get('/', (req, res) => {

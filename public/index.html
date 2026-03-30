@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>InventarioKSC — Iniciar sesión</title>
-  <meta name="description" content="Sistema de gestión de inventario para InventarioKSC. Inicia sesión con tu cuenta corporativa." />
+  <meta name="description"
+    content="Sistema de gestión de inventario para InventarioKSC. Inicia sesión con tu cuenta corporativa." />
   <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
+
 <body>
   <div class="login-page">
     <div class="login-card">
       <!-- Logo / marca -->
       <div class="login-logo">
-        <div class="login-logo-icon">☕</div>
+        <div class="login-logo-icon"><span class="material-symbols-outlined" style="color: white;">local_cafe</span>
+        </div>
         <div>
           <h1>InventarioKSC</h1>
           <span>Gestión de inventario</span>
@@ -29,26 +34,14 @@
       <form id="loginForm" novalidate>
         <div class="form-group">
           <label for="correo">Correo electrónico</label>
-          <input
-            type="email"
-            id="correo"
-            name="correo"
-            placeholder="correo@empresa.com"
-            autocomplete="email"
-            required
-          />
+          <input type="email" id="correo" name="correo" placeholder="correo@empresa.com" autocomplete="email"
+            required />
         </div>
 
         <div class="form-group">
           <label for="contrasena">Contraseña</label>
-          <input
-            type="password"
-            id="contrasena"
-            name="contrasena"
-            placeholder="••••••••"
-            autocomplete="current-password"
-            required
-          />
+          <input type="password" id="contrasena" name="contrasena" placeholder="••••••••"
+            autocomplete="current-password" required />
         </div>
 
         <button type="submit" id="btnIngresar" class="btn-primary">
@@ -60,14 +53,14 @@
 
   <script>
     /* ── Login ──────────────────────────────────────────────── */
-    const form      = document.getElementById('loginForm');
-    const correoEl  = document.getElementById('correo');
-    const passwdEl  = document.getElementById('contrasena');
-    const errorEl   = document.getElementById('loginError');
-    const btnEl     = document.getElementById('btnIngresar');
+    const form = document.getElementById('loginForm');
+    const correoEl = document.getElementById('correo');
+    const passwdEl = document.getElementById('contrasena');
+    const errorEl = document.getElementById('loginError');
+    const btnEl = document.getElementById('btnIngresar');
 
     function showError(msg) {
-      errorEl.textContent  = msg;
+      errorEl.textContent = msg;
       errorEl.classList.add('visible');
     }
     function clearError() {
@@ -81,7 +74,7 @@
       e.preventDefault();
       clearError();
 
-      const correo    = correoEl.value.trim();
+      const correo = correoEl.value.trim();
       const contrasena = passwdEl.value;
 
       // Validación local
@@ -92,14 +85,14 @@
         return;
       }
 
-      btnEl.disabled   = true;
+      btnEl.disabled = true;
       btnEl.textContent = 'Ingresando…';
 
       try {
-        const res  = await fetch('/api/auth/login', {
-          method:  'POST',
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ correo, contrasena }),
+          body: JSON.stringify({ correo, contrasena }),
         });
         const data = await res.json();
 
@@ -127,7 +120,7 @@
       } catch (err) {
         showError('No se pudo conectar al servidor. Intenta de nuevo.');
       } finally {
-        btnEl.disabled    = false;
+        btnEl.disabled = false;
         btnEl.textContent = 'Ingresar';
       }
     });
@@ -135,7 +128,7 @@
     // Si hay sesión activa, redirigir
     (async () => {
       try {
-        const res  = await fetch('/api/auth/me');
+        const res = await fetch('/api/auth/me');
         const data = await res.json();
         if (data.ok) {
           window.location.href = data.usuario.rol === 'administrador'
@@ -145,4 +138,5 @@
     })();
   </script>
 </body>
+
 </html>

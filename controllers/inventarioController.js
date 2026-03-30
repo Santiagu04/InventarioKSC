@@ -10,10 +10,10 @@ const pool = require('../models/db');
 const getAll = async (req, res) => {
     try {
         const [filas] = await pool.query(
-            `SELECT id, nombre, categoria, cantidad, unidad_medida, precio, stock_minimo,
-              ultima_actualizacion
-       FROM productos_insumos
-       ORDER BY nombre ASC`
+            `SELECT id, nombre, categoria, cantidad, unidad_medida, stock_minimo,
+                    es_taller, es_evento, es_producto, ultima_actualizacion
+             FROM productos_insumos
+             ORDER BY nombre ASC`
         );
         return res.json({ ok: true, data: filas });
     } catch (error) {
@@ -24,15 +24,14 @@ const getAll = async (req, res) => {
 
 /**
  * POST /api/inventario
- * Body: { nombre, categoria, cantidad, unidad_medida, precio, stock_minimo }
+ * Body: { nombre, categoria, cantidad, unidad_medida, stock_minimo, es_taller, es_evento, es_producto }
  * Solo administradores.
  */
 const create = async (req, res) => {
-    const { nombre, categoria, cantidad, unidad_medida, precio, stock_minimo } = req.body;
+    const { nombre, categoria, cantidad, unidad_medida, stock_minimo, es_taller, es_evento, es_producto } = req.body;
 
     // Validar campos obligatorios
-    if (!nombre || !categoria || cantidad === undefined || !unidad_medida ||
-        precio === undefined || stock_minimo === undefined) {
+    if (!nombre || !categoria || cantidad === undefined || !unidad_medida || stock_minimo === undefined) {
         return res.status(400).json({
             ok: false,
             mensaje: 'Por favor completa todos los campos requeridos',
@@ -55,15 +54,17 @@ const create = async (req, res) => {
         }
 
         const [resultado] = await pool.query(
-            `INSERT INTO productos_insumos (nombre, categoria, cantidad, unidad_medida, precio, stock_minimo, creado_por)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            `INSERT INTO productos_insumos (nombre, categoria, cantidad, unidad_medida, stock_minimo, es_taller, es_evento, es_producto, creado_por)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 nombre.trim(),
                 categoria,
                 Number(cantidad),
                 unidad_medida,
-                Number(precio),
                 Number(stock_minimo),
+                es_taller ? 1 : 0,
+                es_evento ? 1 : 0,
+                es_producto ? 1 : 0,
                 req.session.usuarioId,
             ]
         );
@@ -83,12 +84,11 @@ const create = async (req, res) => {
 
 /**
  * PUT /api/inventario/:id
- * Body: { nombre, categoria, cantidad, unidad_medida, precio, stock_minimo }
- * Solo administradores.
+ * Body: { nombre, categoria, cantidad, unidad_medida, stock_minimo, es_taller, es_evento, es_producto }
  */
 const update = async (req, res) => {
     const { id } = req.params;
-    const { nombre, categoria, cantidad, unidad_medida, precio, stock_minimo } = req.body;
+    const { nombre, categoria, cantidad, unidad_medida, stock_minimo, es_taller, es_evento, es_producto } = req.body;
     const esAuxiliar = req.session.usuarioRol === 'auxiliar';
 
     if (esAuxiliar) {
@@ -96,8 +96,7 @@ const update = async (req, res) => {
             return res.status(400).json({ ok: false, mensaje: 'Por favor ingresa la cantidad' });
         }
     } else {
-        if (!nombre || !categoria || cantidad === undefined || !unidad_medida ||
-            precio === undefined || stock_minimo === undefined) {
+        if (!nombre || !categoria || cantidad === undefined || !unidad_medida || stock_minimo === undefined) {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Por favor completa todos los campos requeridos',
@@ -135,9 +134,9 @@ const update = async (req, res) => {
 
             await pool.query(
                 `UPDATE productos_insumos
-           SET nombre = ?, categoria = ?, cantidad = ?, unidad_medida = ?, precio = ?, stock_minimo = ?
-           WHERE id = ?`,
-                [nombre.trim(), categoria, Number(cantidad), unidad_medida, Number(precio), Number(stock_minimo), id]
+                 SET nombre = ?, categoria = ?, cantidad = ?, unidad_medida = ?, stock_minimo = ?, es_taller = ?, es_evento = ?, es_producto = ?
+                 WHERE id = ?`,
+                [nombre.trim(), categoria, Number(cantidad), unidad_medida, Number(stock_minimo), es_taller ? 1 : 0, es_evento ? 1 : 0, es_producto ? 1 : 0, id]
             );
         }
 
@@ -154,7 +153,6 @@ const update = async (req, res) => {
 
 /**
  * DELETE /api/inventario/:id
- * Solo administradores.
  */
 const remove = async (req, res) => {
     const { id } = req.params;

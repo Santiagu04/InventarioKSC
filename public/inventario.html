@@ -5,49 +5,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>InventarioKSC — Panel Administrador</title>
-    <meta name="description" content="Panel de administración del inventario InventarioKSC." />
     <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
 
 <body>
     <div class="dashboard">
 
         <!-- ══ SIDEBAR ═══════════════════════════════════════════ -->
-        <aside class="sidebar">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
-                <h2>☕ InventarioKSC</h2>
-                <span>Panel Administrador</span>
+                <button class="btn-toggle-sidebar mobile-only" id="btnCerrarSidebar" aria-label="Cerrar menú">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <h2><span class="material-symbols-outlined">local_cafe</span> InventarioKSC</h2>
             </div>
 
             <nav class="sidebar-nav" aria-label="Navegación principal">
                 <div class="nav-item active" aria-current="page">
-                    <span class="nav-icon">📦</span>
+                    <span class="nav-icon material-symbols-outlined">inventory_2</span>
                     Inventario
                 </div>
                 <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
-                    <span class="nav-icon">🗓️</span>
+                    <span class="nav-icon material-symbols-outlined">calendar_month</span>
                     Eventos
                     <span class="nav-badge-soon">Pronto</span>
                 </div>
                 <div class="nav-item disabled" aria-disabled="true" title="Próximamente">
-                    <span class="nav-icon">🎓</span>
+                    <span class="nav-icon material-symbols-outlined">school</span>
                     Talleres
                     <span class="nav-badge-soon">Pronto</span>
                 </div>
             </nav>
 
-            <div class="sidebar-user">
-                <div class="sidebar-user-avatar">👤</div>
+            <div class="user-dropdown" id="userDropdown" tabindex="0" role="button" aria-haspopup="true">
+                <div class="sidebar-user-avatar"><span class="material-symbols-outlined">person</span></div>
                 <div class="sidebar-user-info">
                     <div class="sidebar-user-name" id="sidebarNombre">—</div>
                     <div class="sidebar-user-rol">Administrador</div>
                 </div>
-                <button class="btn-logout" id="btnLogout" title="Cerrar sesión">↩</button>
+                <span class="material-symbols-outlined"
+                    style="margin-left: auto; color: var(--text-light)">expand_more</span>
+
+                <div class="user-dropdown-menu">
+                    <button class="dropdown-item" id="btnAdminUsuarios">
+                        <span class="material-symbols-outlined">manage_accounts</span> Gestión de usuarios
+                    </button>
+                    <button class="dropdown-item" id="btnAdminCambiarPass">
+                        <span class="material-symbols-outlined">key</span> Actualizar contraseña
+                    </button>
+                    <button class="dropdown-item danger" id="btnLogoutDrop">
+                        <span class="material-symbols-outlined">logout</span> Salir del programa
+                    </button>
+                </div>
             </div>
         </aside>
 
         <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════ -->
         <main class="main-content">
+            <header class="top-bar">
+                <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Abrir menú">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="breadcrumb">Panel Administrador / <strong>Inventario</strong></div>
+            </header>
+
             <div class="section-header">
                 <h1>Inventario</h1>
                 <button class="btn-add" id="btnAbrirFormulario">
@@ -77,19 +100,36 @@
                             <!-- Nombre -->
                             <div class="form-group full-width">
                                 <label for="nombre">Nombre del producto *</label>
-                                <input type="text" id="nombre" placeholder="Ej: Café Geisha 250g" required />
+                                <input type="text" id="nombre" placeholder="Ej: Café 250g" required />
                             </div>
 
-                            <!-- Categoría -->
+                            <!-- Etiqueta -->
                             <div class="form-group">
-                                <label for="categoria">Categoría *</label>
+                                <label for="categoria">Etiqueta *</label>
                                 <select id="categoria" required>
-                                    <option value="">Selecciona una categoría</option>
-                                    <option value="Café">Café</option>
-                                    <option value="Insumo">Insumo</option>
-                                    <option value="Material de evento">Material de evento</option>
-                                    <option value="Otro">Otro</option>
+                                    <option value="">Selecciona una etiqueta</option>
+                                    <option value="Insumos">Insumos</option>
+                                    <option value="Herramientas">Herramientas</option>
+                                    <option value="Accesorios">Accesorios</option>
                                 </select>
+                            </div>
+
+                            <!-- Categoría (Checkboxes) -->
+                            <div class="form-group full-width"
+                                style="display: flex; gap: 20px; align-items: center; margin-top: -10px; margin-bottom: 10px;">
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                    <input type="checkbox" id="es_taller" style="width: 18px; height: 18px;" /> Taller
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                    <input type="checkbox" id="es_evento" style="width: 18px; height: 18px;" /> Evento
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                    <input type="checkbox" id="es_producto" style="width: 18px; height: 18px;" />
+                                    Producto
+                                </label>
                             </div>
 
                             <!-- Unidad de medida -->
@@ -108,19 +148,13 @@
                             <!-- Cantidad -->
                             <div class="form-group">
                                 <label for="cantidad">Cantidad disponible *</label>
-                                <input type="number" id="cantidad" placeholder="0" min="0" step="0.001" required />
+                                <input type="number" id="cantidad" placeholder="0" min="0" step="1" required />
                             </div>
 
-                            <!-- Stock mínimo -->
-                            <div class="form-group">
+                            <!-- Stock mínimo (Solo para Insumos) -->
+                            <div class="form-group" id="stockMinGroupAlta" style="display: none;">
                                 <label for="stock_minimo">Stock mínimo *</label>
-                                <input type="number" id="stock_minimo" placeholder="0" min="0" step="0.001" required />
-                            </div>
-
-                            <!-- Precio -->
-                            <div class="form-group">
-                                <label for="precio">Precio *</label>
-                                <input type="number" id="precio" placeholder="0" min="0" step="0.01" required />
+                                <input type="number" id="stock_minimo" placeholder="0" min="0" step="1" />
                             </div>
                         </div>
 
@@ -134,11 +168,23 @@
 
             <!-- ─── PESTAÑA: Ver Inventario ─────────────────────── -->
             <div id="paneVer" class="tab-pane active" role="tabpanel">
-                <!-- Buscador -->
-                <div class="search-bar">
-                    <span class="search-icon">🔍</span>
-                    <input type="search" id="buscador" placeholder="Buscar por nombre o categoría…"
-                        aria-label="Buscar productos" />
+                <!-- Buscador + Ordenador -->
+                <div class="search-row">
+                    <div class="search-bar">
+                        <span class="search-icon material-symbols-outlined">search</span>
+                        <input type="search" id="buscador" placeholder="Buscar por nombre o etiqueta…"
+                            aria-label="Buscar productos" />
+                    </div>
+                    <div class="sort-bar">
+                        <span class="material-symbols-outlined sort-icon">sort</span>
+                        <select id="ordenador" aria-label="Ordenar inventario">
+                            <option value="default">Sin ordenar</option>
+                            <option value="nombre_asc">Nombre A→Z</option>
+                            <option value="etiqueta">Por etiqueta</option>
+                            <option value="categoria">Por categoría</option>
+                            <option value="stock_alerta">Stock mínimo</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Tabla -->
@@ -148,11 +194,11 @@
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
+                                    <th>Etiqueta</th>
                                     <th>Categoría</th>
                                     <th>Cantidad</th>
                                     <th>Unidad</th>
                                     <th>Stock mínimo</th>
-                                    <th>Precio</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -160,7 +206,8 @@
                                 <tr>
                                     <td colspan="7">
                                         <div class="empty-state">
-                                            <span style="font-size:2rem">📋</span>
+                                            <span class="material-symbols-outlined"
+                                                style="font-size:2.5rem; color: var(--text-muted)">list_alt</span>
                                             <p>Cargando inventario…</p>
                                         </div>
                                     </td>
@@ -201,14 +248,27 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="editCategoria">Categoría *</label>
+                        <label for="editCategoria">Etiqueta *</label>
                         <select id="editCategoria" required>
-                            <option value="">Selecciona una categoría</option>
-                            <option value="Café">Café</option>
-                            <option value="Insumo">Insumo</option>
-                            <option value="Material de evento">Material de evento</option>
-                            <option value="Otro">Otro</option>
+                            <option value="">Selecciona una etiqueta</option>
+                            <option value="Insumos">Insumos</option>
+                            <option value="Herramientas">Herramientas</option>
+                            <option value="Accesorios">Accesorios</option>
                         </select>
+                    </div>
+
+                    <!-- Categoría (Edición Checkboxes) -->
+                    <div class="form-group full-width"
+                        style="display: flex; gap: 20px; align-items: center; margin-top: -10px; margin-bottom: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                            <input type="checkbox" id="editTaller" style="width: 18px; height: 18px;" /> Taller
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                            <input type="checkbox" id="editEvento" style="width: 18px; height: 18px;" /> Evento
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                            <input type="checkbox" id="editProducto" style="width: 18px; height: 18px;" /> Producto
+                        </label>
                     </div>
 
                     <div class="form-group">
@@ -225,17 +285,12 @@
 
                     <div class="form-group">
                         <label for="editCantidad">Cantidad disponible *</label>
-                        <input type="number" id="editCantidad" min="0" step="0.001" required />
+                        <input type="number" id="editCantidad" min="0" step="1" required />
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group" id="stockMinGroupEdit" style="display: none;">
                         <label for="editStockMin">Stock mínimo *</label>
-                        <input type="number" id="editStockMin" min="0" step="0.001" required />
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editPrecio">Precio *</label>
-                        <input type="number" id="editPrecio" min="0" step="0.01" required />
+                        <input type="number" id="editStockMin" min="0" step="1" />
                     </div>
                 </div>
 
@@ -250,12 +305,183 @@
     <!-- ══ MODAL CONFIRMACIÓN ELIMINACIÓN ═══════════════════════ -->
     <div class="modal-overlay" id="modalEliminar" role="dialog" aria-modal="true" aria-labelledby="modalEliminarTitulo">
         <div class="modal confirm-modal">
-            <div class="confirm-icon">🗑️</div>
+            <div class="confirm-icon"><span class="material-symbols-outlined"
+                    style="font-size: 2.5rem; color: var(--red-alert)">delete</span></div>
             <h3 id="modalEliminarTitulo">¿Eliminar producto?</h3>
             <p id="confirmMsg">Esta acción no se puede deshacer.</p>
             <div class="confirm-actions">
                 <button class="btn-danger" id="btnConfirmarEliminar">Sí, eliminar</button>
                 <button class="btn-cancel" id="btnCancelarEliminar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL GESTIÓN DE USUARIOS ════════════════════════════ -->
+    <div class="modal-overlay" id="modalUsuarios" role="dialog" aria-modal="true" aria-labelledby="modalUsuariosTitulo">
+        <div class="modal" style="max-width: 760px;">
+            <div class="modal-header">
+                <h3 id="modalUsuariosTitulo">Gestión de Usuarios</h3>
+                <button class="btn-close-modal" id="btnCerrarModalUsuarios" aria-label="Cerrar">✕</button>
+            </div>
+
+            <div id="modalUsuariosAlert" class="form-alert"></div>
+
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <!-- Formulario para crear -->
+                <div style="flex: 1; min-width: 250px;">
+                    <h4 style="margin-bottom: 16px; font-size: 0.95rem; color: var(--text-dark);">Crear nuevo usuario
+                    </h4>
+                    <form id="formCrearUsuario" novalidate>
+                        <div class="form-group">
+                            <label for="newUserName">Nombre completo *</label>
+                            <input type="text" id="newUserName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserEmail">Correo electrónico *</label>
+                            <input type="email" id="newUserEmail" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPass">Contraseña temporal *</label>
+                            <input type="password" id="newUserPass" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserRol">Rol de acceso *</label>
+                            <select id="newUserRol" required>
+                                <option value="auxiliar">Auxiliar</option>
+                                <option value="administrador">Administrador</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-save" style="width: 100%;">Crear Perfil</button>
+                    </form>
+                </div>
+
+                <!-- Tabla de usuarios vigentes -->
+                <div style="flex: 1.5; min-width: 300px; padding-top: 5px;">
+                    <h4 style="margin-bottom: 16px; font-size: 0.95rem; color: var(--text-dark);">Usuarios vigentes</h4>
+                    <div class="table-wrapper"
+                        style="max-height: 400px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+                        <table style="width: 100%;">
+                            <thead style="position: sticky; top: 0; background: var(--bg-main); z-index: 1;">
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th style="text-align: right;">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyUsuarios">
+                                <tr>
+                                    <td colspan="4" style="text-align:center;">Cargando usuarios...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL EDITAR USUARIO (ADMIN) ════════════════════════════ -->
+    <div class="modal-overlay" id="modalEditarUsuario" role="dialog" aria-modal="true"
+        aria-labelledby="modalEditarUsuarioTitulo">
+        <div class="modal" style="max-width: 400px; z-index: 250;">
+            <div class="modal-header">
+                <h3 id="modalEditarUsuarioTitulo">Editar Usuario</h3>
+                <button class="btn-close-modal" id="btnCerrarModalEditarUsuario" aria-label="Cerrar">✕</button>
+            </div>
+            <div id="modalEditarUsuarioAlert" class="form-alert"></div>
+            <form id="formEditarUsuario" novalidate>
+                <input type="hidden" id="editUserId" />
+                <div class="form-group">
+                    <label for="editUserName">Nombre completo *</label>
+                    <input type="text" id="editUserName" required />
+                </div>
+                <div class="form-group">
+                    <label for="editUserEmail">Correo electrónico *</label>
+                    <input type="email" id="editUserEmail" required />
+                </div>
+                <div class="form-group">
+                    <label for="editUserPass">Nueva contraseña (Opcional)</label>
+                    <input type="password" id="editUserPass" placeholder="Dejar en blanco para no cambiar" />
+                </div>
+                <div class="form-group">
+                    <label for="editUserRol">Rol *</label>
+                    <select id="editUserRol" required>
+                        <option value="auxiliar">Auxiliar</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-save" style="width: 100%;">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ MODAL ALERTA STOCK BAJO ═══════════════════════════ -->
+    <div class="modal-overlay" id="modalStockAlert" role="dialog" aria-modal="true">
+        <div class="modalLowStock">
+            <div class="modal-header">
+                <h3 style="color: var(--red-alert); display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-outlined">warning</span> ¡Atención: Stock Bajo!
+                </h3>
+                <button class="btn-close-modal" id="btnCerrarStockAlert">✕</button>
+            </div>
+            <p style="margin: 10px 0; font-size: 0.95rem; line-height: 1.5;">
+                Los siguientes productos están por debajo del stock mínimo. Se debe abastecer a la brevedad.
+            </p>
+            <div class="low-stock-list" id="lowStockList">
+                <!-- Se llena por JS -->
+            </div>
+            <div class="form-actions" style="margin-top: 20px;">
+                <button class="btn-save" style="width: 100%;" id="btnEntendidoStock">Entendido</button>
+            </div>
+        </div>
+    </div>
+    <!-- ══ MODAL CAMBIAR CONTRASEÑA ════════════════════════════ -->
+    <div class="modal-overlay" id="modalPass" role="dialog" aria-modal="true" aria-labelledby="modalPassTitulo">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3 id="modalPassTitulo">Actualizar Contraseña</h3>
+                <button class="btn-close-modal" id="btnCerrarModalPass" aria-label="Cerrar">✕</button>
+            </div>
+            <div id="modalPassAlert" class="form-alert"></div>
+            <form id="formCambiarPass" novalidate>
+                <div class="form-group">
+                    <label for="oldPass">Contraseña actual *</label>
+                    <input type="password" id="oldPass" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPass">Nueva contraseña *</label>
+                    <input type="password" id="newPass" required minlength="6" />
+                </div>
+                <button type="submit" class="btn-save" style="width: 100%; margin-top: 10px;">Actualizar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ MODAL CONFIRMAR DESHABILITAR/HABILITAR USUARIO ═══ -->
+    <div class="modal-overlay" id="modalToggleUsuario" role="dialog" aria-modal="true" style="z-index: 2100;">
+        <div class="modal confirm-modal" style="z-index: 2101;">
+            <div class="confirm-icon"><span class="material-symbols-outlined" id="toggleUsuarioIcon"
+                    style="font-size: 2.5rem; color: var(--olive)">power_settings_new</span></div>
+            <h3 id="toggleUsuarioTitulo">¿Deshabilitar usuario?</h3>
+            <p id="toggleUsuarioMsg">Esta acción impedirá que el usuario inicie sesión.</p>
+            <div class="confirm-actions">
+                <button class="btn-save" id="btnConfirmarToggle">Confirmar</button>
+                <button class="btn-cancel" id="btnCancelarToggle">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL CONFIRMAR ELIMINAR USUARIO ═════════════════ -->
+    <div class="modal-overlay" id="modalEliminarUsuario" role="dialog" aria-modal="true" style="z-index: 2100;">
+        <div class="modal confirm-modal" style="z-index: 2101;">
+            <div class="confirm-icon"><span class="material-symbols-outlined"
+                    style="font-size: 2.5rem; color: var(--red-alert)">person_remove</span></div>
+            <h3>¿Eliminar usuario?</h3>
+            <p id="eliminarUsuarioMsg">Esta acción no se puede deshacer.</p>
+            <div class="confirm-actions">
+                <button class="btn-danger" id="btnConfirmarEliminarUsuario">Sí, eliminar</button>
+                <button class="btn-cancel" id="btnCancelarEliminarUsuario">Cancelar</button>
             </div>
         </div>
     </div>
