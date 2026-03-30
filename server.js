@@ -42,10 +42,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Rutas de la API ─────────────────────────────────────
 const usuariosRoutes = require('./routes/usuarios');
+const eventosRoutes  = require('./routes/eventos');
+const talleresRoutes = require('./routes/talleres');
 
-app.use('/api/auth', authRoutes);
+app.use('/api/auth',       authRoutes);
 app.use('/api/inventario', inventarioRoutes);
-app.use('/api/usuarios', usuariosRoutes);
+app.use('/api/usuarios',   usuariosRoutes);
+app.use('/api/eventos',    eventosRoutes);
+app.use('/api/talleres',   talleresRoutes);
 
 // ── Rutas de navegación — devuelve el HTML correspondiente ──
 app.get('/', (req, res) => {
@@ -58,6 +62,14 @@ app.get('/inventario', (req, res) => {
 
 app.get('/auxiliar', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'auxiliar.html'));
+});
+
+app.get('/eventos', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'eventos.html'));
+});
+
+app.get('/talleres', (_req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'talleres.html'));
 });
 
 // ── 404 catch-all ─────────────────────────────────────────

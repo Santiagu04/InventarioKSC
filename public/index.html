@@ -110,6 +110,9 @@
           return;
         }
 
+        // Limpiar estado de sesión anterior para que las alertas se muestren de nuevo
+        sessionStorage.removeItem('stockAlertShown');
+
         // Redirigir según rol
         const rol = data.usuario.rol;
         if (rol === 'administrador') {

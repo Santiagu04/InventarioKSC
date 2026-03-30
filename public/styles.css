@@ -175,7 +175,8 @@ textarea {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
   width: 100%;
   padding: 11px 14px;
   border: 1.5px solid var(--border);
@@ -185,10 +186,12 @@ textarea {
   background: var(--white);
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
   border-color: var(--olive);
   box-shadow: 0 0 0 3px var(--olive-light);
 }
@@ -1228,4 +1231,121 @@ tbody td {
     width: 100%;
     margin-bottom: 10px;
   }
+}
+/* ══════════════════════════════════════════════════════════
+   EVENTOS
+══════════════════════════════════════════════════════════ */
+
+.eventos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 20px;
+}
+
+/* Card de evento */
+.evento-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.evento-card-header {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-main);
+}
+
+.evento-card-info { flex: 1; min-width: 0; }
+
+.evento-nombre {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.evento-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  align-items: center;
+}
+
+.evento-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Botón terminar evento */
+.btn-terminar {
+  padding: 6px 12px;
+  background: none;
+  border: 1.5px solid var(--coral);
+  color: var(--coral);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-terminar:hover {
+  background: var(--coral);
+  color: var(--white);
+}
+
+/* Checklist dentro de la card */
+.evento-checklist { padding: 14px 20px; }
+
+.checklist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Filtros de categoría en el builder */
+.cat-filter {
+  font-size: 0.8rem;
+  padding: 5px 12px;
+}
+
+/* Estado vacío de eventos */
+.eventos-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.eventos-empty .material-symbols-outlined {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .eventos-grid { grid-template-columns: 1fr; }
+  .evento-card-header { flex-direction: column; }
+  .evento-card-actions { align-self: flex-end; }
 }

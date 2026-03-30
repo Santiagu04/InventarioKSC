@@ -240,12 +240,6 @@ function setupTabs() {
     tabAgregar.addEventListener('click', () => activarTab(tabAgregar));
     tabVer.addEventListener('click', () => activarTab(tabVer));
 
-    // El botón "+ Agregar Producto" de la cabecera abre la pestaña Agregar
-    document.getElementById('btnAbrirFormulario').addEventListener('click', () => {
-        resetFormAlta();
-        activarTab(tabAgregar);
-    });
-
     // Cancelar en formulario de alta vuelve a Ver Inventario
     document.getElementById('btnCancelarForm').addEventListener('click', () => {
         activarTab(tabVer);

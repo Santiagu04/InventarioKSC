@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>InventarioKSC — Talleres</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="dashboard">
+
+        <!-- ══ SIDEBAR ═══════════════════════════════════════════ -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <button class="btn-toggle-sidebar mobile-only" id="btnCerrarSidebar" aria-label="Cerrar menú">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <h2><span class="material-symbols-outlined">local_cafe</span> InventarioKSC</h2>
+            </div>
+
+            <nav class="sidebar-nav" aria-label="Navegación principal">
+                <div class="nav-item" id="navInventario" style="cursor:pointer;">
+                    <span class="nav-icon material-symbols-outlined">inventory_2</span>
+                    Inventario
+                </div>
+                <div class="nav-item" id="navEventos" style="cursor:pointer;">
+                    <span class="nav-icon material-symbols-outlined">calendar_month</span>
+                    Eventos
+                </div>
+                <div class="nav-item active">
+                    <span class="nav-icon material-symbols-outlined">school</span>
+                    Talleres
+                </div>
+            </nav>
+
+            <div class="user-dropdown" id="userDropdown" tabindex="0" role="button" aria-haspopup="true">
+                <div class="sidebar-user-avatar"><span class="material-symbols-outlined">person</span></div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="sidebarNombre">—</div>
+                    <div class="sidebar-user-rol" id="sidebarRol">—</div>
+                </div>
+                <span class="material-symbols-outlined"
+                    style="margin-left: auto; color: var(--text-light)">expand_more</span>
+                <div class="user-dropdown-menu">
+                    <button class="dropdown-item" id="btnAdminUsuariosTal" style="display:none;">
+                        <span class="material-symbols-outlined">manage_accounts</span> Gestión de usuarios
+                    </button>
+                    <button class="dropdown-item" id="btnCambiarPassTal">
+                        <span class="material-symbols-outlined">key</span> Actualizar contraseña
+                    </button>
+                    <button class="dropdown-item danger" id="btnLogoutDrop">
+                        <span class="material-symbols-outlined">logout</span> Salir del programa
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ══ CONTENIDO PRINCIPAL ══════════════════════════════ -->
+        <main class="main-content">
+            <header class="top-bar">
+                <button class="btn-toggle-sidebar" id="btnToggleSidebar" aria-label="Abrir menú">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="breadcrumb">Panel / <strong>Talleres</strong></div>
+            </header>
+
+            <div class="section-header">
+                <h1>Talleres</h1>
+            </div>
+
+            <!-- Tabs (inyectadas por JS según rol) -->
+            <div class="tabs" role="tablist" id="tabsContainer"></div>
+
+            <!-- ─── PANE: Crear Taller (solo Admin) ─────────────── -->
+            <div id="paneCrear" class="tab-pane" role="tabpanel">
+
+                <!-- Step 1: Datos del taller -->
+                <div id="stepInfo" class="form-card fade-in">
+                    <h3 style="margin-bottom:20px;font-size:1rem;color:var(--text-dark);">Datos del taller</h3>
+                    <div id="alertCrear" class="form-alert"></div>
+                    <form id="formTallerInfo" novalidate>
+                        <div class="form-grid">
+
+                            <div class="form-group full-width">
+                                <label for="tallerTipo">Tipo de taller *</label>
+                                <select id="tallerTipo" required>
+                                    <option value="">— Seleccionar —</option>
+                                    <option value="Trazando">Trazando</option>
+                                    <option value="Métodos de preparación">Métodos de preparación</option>
+                                    <option value="Cataciones sensoriales">Cataciones sensoriales</option>
+                                    <option value="Bebidas a base de café">Bebidas a base de café</option>
+                                    <option value="Aprovechamiento de residuos">Aprovechamiento de residuos</option>
+                                    <option value="Tour comuna 1">Tour comuna 1</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="tallerDescripcion">Descripción del taller</label>
+                                <textarea id="tallerDescripcion" rows="4" readonly
+                                    placeholder="Selecciona el tipo de taller para ver la descripción…"
+                                    style="resize:none;background:var(--bg-main);color:var(--text-muted);font-size:0.85rem;line-height:1.55;"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tallerAsistentes">Número de asistentes *</label>
+                                <input type="number" id="tallerAsistentes" min="1" step="1"
+                                    placeholder="Ej: 15" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tallerLugar">Lugar *</label>
+                                <input type="text" id="tallerLugar" placeholder="Ej: Sede principal" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tallerFecha">Fecha *</label>
+                                <input type="date" id="tallerFecha" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="tallerResponsable">Responsable *</label>
+                                <input type="text" id="tallerResponsable" placeholder="Nombre del responsable"
+                                    required />
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="tallerNotas">Notas <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                                <textarea id="tallerNotas" rows="2"
+                                    placeholder="Información adicional relevante del taller…"
+                                    style="resize:vertical;"></textarea>
+                            </div>
+
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-save">Continuar con Checklist →</button>
+                            <button type="button" class="btn-cancel" id="btnCancelarInfo">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Step 2: Checklist builder -->
+                <div id="stepChecklist" style="display:none;">
+
+                    <!-- Resumen del taller -->
+                    <div class="card"
+                        style="padding:14px 20px;margin-bottom:16px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;border-left:4px solid var(--olive);">
+                        <strong id="summTipo" style="font-size:1rem;">—</strong>
+                        <span style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">calendar_today</span>
+                            <span id="summFecha">—</span>
+                        </span>
+                        <span style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">location_on</span>
+                            <span id="summLugar">—</span>
+                        </span>
+                        <span style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">person</span>
+                            <span id="summResponsable">—</span>
+                        </span>
+                        <span style="color:var(--text-muted);font-size:0.85rem;display:flex;align-items:center;gap:4px;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">group</span>
+                            <span id="summAsistentes">—</span> asistentes
+                        </span>
+                        <button class="btn-cancel" id="btnVolverInfo"
+                            style="margin-left:auto;padding:6px 14px;font-size:0.85rem;">← Volver</button>
+                    </div>
+
+                    <!-- Checklist table -->
+                    <div class="card" style="margin-bottom:16px;">
+                        <div style="padding:14px 20px 0;display:flex;justify-content:space-between;align-items:center;">
+                            <h3 style="font-size:0.92rem;margin:0;color:var(--text-dark);">Checklist del taller</h3>
+                            <span id="countChecklist" style="font-size:0.8rem;color:var(--text-muted);">0 productos</span>
+                        </div>
+                        <div id="alertChecklist" class="form-alert" style="margin:8px 20px 0;"></div>
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Etiqueta</th>
+                                        <th>Unidad</th>
+                                        <th>Stock</th>
+                                        <th>Cantidad a llevar</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyChecklist">
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">
+                                            Cargando productos…</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Agregar más productos -->
+                    <div class="card" style="margin-bottom:20px;">
+                        <div style="padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+                            <h3 style="font-size:0.92rem;margin:0;color:var(--text-dark);">Agregar más productos</h3>
+                            <div style="display:flex;gap:8px;">
+                                <button class="tab-btn cat-filter active" data-cat="taller">Taller</button>
+                                <button class="tab-btn cat-filter" data-cat="producto">Producto</button>
+                                <button class="tab-btn cat-filter" data-cat="evento">Eventos</button>
+                            </div>
+                        </div>
+                        <div class="table-wrapper" style="max-height:260px;overflow-y:auto;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Etiqueta</th>
+                                        <th>Unidad</th>
+                                        <th>Stock</th>
+                                        <th>Cantidad</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbodyAgregarMas">
+                                    <tr>
+                                        <td colspan="6" style="text-align:center;padding:16px;color:var(--text-muted);">
+                                            Cargando…</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="border-top:none;margin-top:0;padding-top:0;">
+                        <button class="btn-save" id="btnFinalizarTaller">Crear Taller</button>
+                        <button class="btn-cancel" id="btnCancelarChecklist">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── PANE: Ver Talleres ────────────────────────── -->
+            <div id="paneVer" class="tab-pane active" role="tabpanel">
+                <div id="listaTalleresActivos">
+                    <div class="eventos-empty card" style="padding:40px;">
+                        <span class="material-symbols-outlined">school</span>
+                        <p>Cargando talleres…</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── PANE: Historial ───────────────────────────── -->
+            <div id="paneHistorial" class="tab-pane" role="tabpanel">
+                <div class="card">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo de taller</th>
+                                    <th>Fecha</th>
+                                    <th>Lugar</th>
+                                    <th>Responsable</th>
+                                    <th>Asistentes</th>
+                                    <th>Terminado el</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyHistorial">
+                                <tr>
+                                    <td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">
+                                        Cargando historial…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ══ MODAL: Editar datos del taller (Admin) ════════════ -->
+    <div class="modal-overlay" id="modalEditarTaller" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:540px;">
+            <div class="modal-header">
+                <h3>Editar taller</h3>
+                <button class="btn-close-modal" id="btnCerrarEditarTaller">✕</button>
+            </div>
+            <div id="alertEditarTaller" class="form-alert"></div>
+            <form id="formEditarTaller" novalidate>
+                <input type="hidden" id="editTallerId" />
+                <div class="form-grid">
+
+                    <div class="form-group full-width">
+                        <label for="editTallerTipo">Tipo de taller *</label>
+                        <select id="editTallerTipo" required>
+                            <option value="">— Seleccionar —</option>
+                            <option value="Trazando">Trazando</option>
+                            <option value="Métodos de preparación">Métodos de preparación</option>
+                            <option value="Cataciones sensoriales">Cataciones sensoriales</option>
+                            <option value="Bebidas a base de café">Bebidas a base de café</option>
+                            <option value="Aprovechamiento de residuos">Aprovechamiento de residuos</option>
+                            <option value="Tour comuna 1">Tour comuna 1</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="editTallerDescripcion">Descripción</label>
+                        <textarea id="editTallerDescripcion" rows="3" readonly
+                            style="resize:none;background:var(--bg-main);color:var(--text-muted);font-size:0.85rem;line-height:1.55;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTallerAsistentes">Número de asistentes *</label>
+                        <input type="number" id="editTallerAsistentes" min="1" step="1" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTallerLugar">Lugar *</label>
+                        <input type="text" id="editTallerLugar" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTallerFecha">Fecha *</label>
+                        <input type="date" id="editTallerFecha" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTallerResponsable">Responsable *</label>
+                        <input type="text" id="editTallerResponsable" required />
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="editTallerNotas">Notas <span style="color:var(--text-muted);font-weight:400;">(opcional)</span></label>
+                        <textarea id="editTallerNotas" rows="2" style="resize:vertical;"></textarea>
+                    </div>
+
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-save">Guardar cambios</button>
+                    <button type="button" class="btn-cancel" id="btnCancelarEditarTaller">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Terminar taller (Admin) ════════════════════ -->
+    <div class="modal-overlay" id="modalTerminarTaller" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:640px;">
+            <div class="modal-header">
+                <h3>Terminar taller — Devolución al inventario</h3>
+                <button class="btn-close-modal" id="btnCerrarTerminarTaller">✕</button>
+            </div>
+            <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:16px;line-height:1.5;">
+                Selecciona qué vas a devolver al inventario y en qué cantidad.
+                Lo que no devuelvas se considerará consumido.
+            </p>
+            <div id="alertTerminar" class="form-alert"></div>
+            <div class="table-wrapper"
+                style="max-height:320px;overflow-y:auto;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:16px;">
+                <table>
+                    <thead style="position:sticky;top:0;background:var(--bg-main);">
+                        <tr>
+                            <th style="width:36px;">
+                                <input type="checkbox" id="checkTodosDevolver" title="Seleccionar todos" checked />
+                            </th>
+                            <th>Producto</th>
+                            <th>Llevado</th>
+                            <th>Devolver</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyTerminar"></tbody>
+                </table>
+            </div>
+            <div class="confirm-actions">
+                <button class="btn-danger" id="btnConfirmarTerminar">Terminar taller definitivamente</button>
+                <button class="btn-cancel" id="btnCancelarTerminarTaller">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Confirmar eliminar item del checklist ══════ -->
+    <div class="modal-overlay" id="modalEliminarItem" role="dialog" aria-modal="true">
+        <div class="modal confirm-modal">
+            <div class="confirm-icon">
+                <span class="material-symbols-outlined"
+                    style="font-size:2.5rem;color:var(--red-alert);">remove_shopping_cart</span>
+            </div>
+            <h3>¿Eliminar del checklist?</h3>
+            <p id="msgEliminarItem">La cantidad se devolverá al inventario automáticamente.</p>
+            <div class="confirm-actions">
+                <button class="btn-danger" id="btnConfirmarEliminarItem">Sí, eliminar</button>
+                <button class="btn-cancel" id="btnCancelarEliminarItem">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Agregar producto a taller existente ════════ -->
+    <div class="modal-overlay" id="modalAgregarItem" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:560px;">
+            <div class="modal-header">
+                <h3>Agregar producto al checklist</h3>
+                <button class="btn-close-modal" id="btnCerrarAgregarItem">✕</button>
+            </div>
+            <div id="alertAgregarItem" class="form-alert"></div>
+            <div class="search-bar" style="margin-bottom:12px;">
+                <span class="search-icon material-symbols-outlined">search</span>
+                <input type="search" id="buscarItemAgregar" placeholder="Buscar producto por nombre o etiqueta…"
+                    aria-label="Buscar producto" />
+            </div>
+            <div class="table-wrapper"
+                style="max-height:300px;overflow-y:auto;border:1.5px solid var(--border);border-radius:var(--radius-sm);margin-bottom:14px;">
+                <table>
+                    <thead style="position:sticky;top:0;background:var(--bg-main);">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Etiqueta</th>
+                            <th>Stock</th>
+                            <th>Cantidad</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAgregarItem"></tbody>
+                </table>
+            </div>
+            <button class="btn-cancel" id="btnCerrarAgregarItemFooter" style="width:100%;">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: Actualizar contraseña ══════════════════════ -->
+    <div class="modal-overlay" id="modalPassTal" role="dialog" aria-modal="true">
+        <div class="modal" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>Actualizar Contraseña</h3>
+                <button class="btn-close-modal" id="btnCerrarModalPassTal" aria-label="Cerrar">✕</button>
+            </div>
+            <div id="modalPassTalAlert" class="form-alert"></div>
+            <form id="formCambiarPassTal" novalidate>
+                <div class="form-group">
+                    <label for="oldPassTal">Contraseña actual *</label>
+                    <input type="password" id="oldPassTal" required />
+                </div>
+                <div class="form-group">
+                    <label for="newPassTal">Nueva contraseña *</label>
+                    <input type="password" id="newPassTal" required minlength="6" />
+                </div>
+                <button type="submit" class="btn-save" style="width:100%;margin-top:10px;">Actualizar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <script src="talleres.js"></script>
+</body>
+
+</html>

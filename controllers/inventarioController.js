@@ -167,6 +167,12 @@ const remove = async (req, res) => {
         await pool.query('DELETE FROM productos_insumos WHERE id = ?', [id]);
         return res.json({ ok: true, mensaje: 'Producto eliminado correctamente' });
     } catch (error) {
+        if (error.errno === 1451) {
+            return res.status(409).json({
+                ok: false,
+                mensaje: 'No se puede eliminar: el producto está en uso en uno o más eventos activos'
+            });
+        }
         console.error('Error al eliminar producto:', error);
         return res.status(500).json({ ok: false, mensaje: 'Error al eliminar producto' });
     }
